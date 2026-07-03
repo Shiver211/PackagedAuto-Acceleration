@@ -40,7 +40,7 @@ public abstract class MixinTileUpdate {
     private static final Map<TileBase, Double> PackagedAcceleration$extraTickProgress = new WeakHashMap<>();
     private static final ThreadLocal<Boolean> PackagedAcceleration$runningExtraTicks = ThreadLocal.withInitial(()->false);
 
-    @Inject(method = "update", at = @At("RETURN"), remap = false)
+    @Inject(method = {"update", "func_73660_a"}, at = @At("RETURN"), remap = false)
     private void PackagedAcceleration$runExtraUpdates(CallbackInfo ci) {
         if(PackagedAcceleration$runningExtraTicks.get()) {
             return;

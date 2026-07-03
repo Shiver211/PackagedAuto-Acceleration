@@ -1,11 +1,10 @@
 package com.shiver.pkgacc.mixin;
 
-import net.minecraft.launchwrapper.Launch;
+import net.minecraftforge.fml.common.Loader;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -21,12 +20,15 @@ public class PackagedAccelerationMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        try {
-            return Launch.classLoader.getClassBytes(targetClassName) != null;
+        String prefix = "thelm.";
+        int tilePackageStart = targetClassName.indexOf(prefix);
+        int tilePackageEnd = targetClassName.indexOf(".tile.");
+        if(tilePackageStart == -1 || tilePackageEnd == -1) {
+            return true;
         }
-        catch(IOException e) {
-            return false;
-        }
+
+        String modId = targetClassName.substring(tilePackageStart+prefix.length(), tilePackageEnd);
+        return Loader.isModLoaded(modId);
     }
 
     @Override

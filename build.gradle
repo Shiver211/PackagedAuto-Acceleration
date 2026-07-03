@@ -208,7 +208,7 @@ processResources {
 jar {
     manifest {
         def attribute_map = [:]
-        if (propertyBool('use_mixins')) {
+        if (propertyBool('use_mixins') && !propertyBool('is_coremod')) {
             attribute_map['MixinConfigs'] = propertyStringList('mixin_configs').collect { "mixins.${it}.json" }.join(',')
         }
         if (propertyBool('is_coremod')) {
