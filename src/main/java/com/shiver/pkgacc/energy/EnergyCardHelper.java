@@ -45,6 +45,23 @@ public class EnergyCardHelper {
         return 1D + cards * PackagedAccelerationConfig.energyPerCard;
     }
 
+    public static void writeSync(TileEntity tile, NBTTagCompound nbt) {
+        nbt.setInteger(ENERGY_CARDS_KEY, getCards(tile));
+    }
+
+    public static void readSync(TileEntity tile, NBTTagCompound nbt) {
+        if(tile instanceof TileBase) {
+            int cards = clampCards(nbt.getInteger(ENERGY_CARDS_KEY));
+            NBTTagCompound data = tile.getTileData();
+            if(cards > 0) {
+                data.setInteger(ENERGY_CARDS_KEY, cards);
+            }
+            else {
+                data.removeTag(ENERGY_CARDS_KEY);
+            }
+        }
+    }
+
     public static void applyCapacity(TileBase tile) {
         EnergyStorage storage = tile.getEnergyStorage();
         if(storage.getMaxEnergyStored() <= 0) {

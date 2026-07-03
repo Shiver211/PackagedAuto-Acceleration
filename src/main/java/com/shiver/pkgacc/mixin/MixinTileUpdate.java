@@ -46,11 +46,18 @@ public abstract class MixinTileUpdate {
             return;
         }
         TileBase tile = (TileBase)(Object)this;
-        if(tile.getWorld() == null || tile.getWorld().isRemote || tile.isInvalid()) {
+        if(tile.getWorld() == null || tile.isInvalid()) {
             return;
         }
+        // Reapply the expanded capacity on both sides every tick. The capacity is
+        // not persisted (only the stored energy is) nor synced (getUpdateTag strips
+        // ForgeData), so the client tile would otherwise keep the default capacity
+        // after a chunk load until the card GUI forced a resync.
         if(EnergyCardHelper.isSupported(tile)) {
             EnergyCardHelper.applyCapacity(tile);
+        }
+        if(tile.getWorld().isRemote) {
+            return;
         }
         int extraTicks = PackagedAcceleration$getExtraTicks(tile);
         if(extraTicks <= 0) {

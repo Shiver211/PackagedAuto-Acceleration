@@ -1,7 +1,7 @@
 itemGroup.packaged_acceleration=Packaged Acceleration
 item.packaged_acceleration.speed_card.name=Speed Card
+container.packaged_acceleration.title=Insert Upgrade Card
 container.packaged_acceleration.speed_card=Speed Cards
-container.packaged_acceleration.speed_card.multiplier=Cards: %d  Speed: %.2fx
+container.packaged_acceleration.speed_card.multiplier=Speed: %.2fx
 item.packaged_acceleration.energy_card.name=Energy Card
-container.packaged_acceleration.energy_card=Energy Cards
-container.packaged_acceleration.energy_card.multiplier=Cards: %d  Capacity: %.2fx
+container.packaged_acceleration.energy_card.multiplier=Capacity: %.2fx

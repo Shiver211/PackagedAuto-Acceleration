@@ -26,14 +26,14 @@ public class GuiCard extends GuiContainer {
 
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        String title = I18n.format("container.packaged_acceleration.speed_card");
-        fontRenderer.drawString(title, 8, 6, 4210752);
+        String title = I18n.format("container.packaged_acceleration.title");
+        fontRenderer.drawString(title, 65, 6, 4210752);
         int speedCards = SpeedCardHelper.getCards(tile);
-        String speed = I18n.format("container.packaged_acceleration.speed_card.multiplier", speedCards, SpeedCardHelper.getMultiplier(speedCards));
-        fontRenderer.drawString(speed, 8, 20, 4210752);
+        String speed = I18n.format("container.packaged_acceleration.speed_card.multiplier", SpeedCardHelper.getMultiplier(speedCards));
+        fontRenderer.drawString(speed, 8, 15, 4210752);
         int energyCards = EnergyCardHelper.getCards(tile);
-        String energy = I18n.format("container.packaged_acceleration.energy_card.multiplier", energyCards, EnergyCardHelper.getMultiplier(energyCards));
-        fontRenderer.drawString(energy, 8, 30, 4210752);
+        String energy = I18n.format("container.packaged_acceleration.energy_card.multiplier", EnergyCardHelper.getMultiplier(energyCards));
+        fontRenderer.drawString(energy, 8, 25, 4210752);
         fontRenderer.drawString(playerInventory.getDisplayName().getUnformattedText(), 8, 74, 4210752);
     }
 
