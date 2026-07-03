@@ -2,3 +2,6 @@ itemGroup.packaged_acceleration=封包加速
 item.packaged_acceleration.speed_card.name=封包加速卡
 container.packaged_acceleration.speed_card=放置加速卡
 container.packaged_acceleration.speed_card.multiplier=数量: %d  速度: %.2fx
+item.packaged_acceleration.energy_card.name=封包储能卡
+container.packaged_acceleration.energy_card=放置储能卡
+container.packaged_acceleration.energy_card.multiplier=数量: %d  容量: %.2fx

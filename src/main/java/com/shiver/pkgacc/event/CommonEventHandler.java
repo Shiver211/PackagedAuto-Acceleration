@@ -1,7 +1,10 @@
 package com.shiver.pkgacc.event;
 
 import com.shiver.pkgacc.PackagedAcceleration;
+import com.shiver.pkgacc.energy.EnergyCardHelper;
+import com.shiver.pkgacc.item.ItemEnergyCard;
 import com.shiver.pkgacc.item.ItemSpeedCard;
+import com.shiver.pkgacc.network.GuiHandler;
 import com.shiver.pkgacc.speed.SpeedCardHelper;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -16,7 +19,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class CommonEventHandler {
 
     public static final CommonEventHandler INSTANCE = new CommonEventHandler();
-    private static final int GUI_SPEED_CARD = 0;
 
     private CommonEventHandler() {}
 
@@ -28,7 +30,10 @@ public class CommonEventHandler {
     public void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         EntityPlayer player = event.getEntityPlayer();
         ItemStack held = player.getHeldItem(event.getHand());
-        if(!player.isSneaking() || held.getItem() != ItemSpeedCard.INSTANCE) {
+        if(!player.isSneaking()) {
+            return;
+        }
+        if(held.getItem() != ItemSpeedCard.INSTANCE && held.getItem() != ItemEnergyCard.INSTANCE) {
             return;
         }
         TileEntity tile = event.getWorld().getTileEntity(event.getPos());
@@ -37,7 +42,7 @@ public class CommonEventHandler {
         }
         event.setCanceled(true);
         if(!event.getWorld().isRemote) {
-            player.openGui(PackagedAcceleration.instance, GUI_SPEED_CARD, event.getWorld(), event.getPos().getX(), event.getPos().getY(), event.getPos().getZ());
+            player.openGui(PackagedAcceleration.instance, GuiHandler.GUI_CARDS, event.getWorld(), event.getPos().getX(), event.getPos().getY(), event.getPos().getZ());
         }
     }
 
@@ -47,15 +52,20 @@ public class CommonEventHandler {
             return;
         }
         TileEntity tile = event.getWorld().getTileEntity(event.getPos());
-        int cards = SpeedCardHelper.getCards(tile);
+        dropCards(event, tile, SpeedCardHelper.getCards(tile), ItemSpeedCard.INSTANCE);
+        dropCards(event, tile, EnergyCardHelper.getCards(tile), ItemEnergyCard.INSTANCE);
+        SpeedCardHelper.setCards(tile, 0);
+        EnergyCardHelper.setCards(tile, 0);
+    }
+
+    private void dropCards(BlockEvent.BreakEvent event, TileEntity tile, int cards, net.minecraft.item.Item card) {
         if(cards > 0) {
             event.getWorld().spawnEntity(new EntityItem(
                     event.getWorld(),
                     event.getPos().getX()+0.5D,
                     event.getPos().getY()+0.5D,
                     event.getPos().getZ()+0.5D,
-                    new ItemStack(ItemSpeedCard.INSTANCE, cards)));
-            SpeedCardHelper.setCards(tile, 0);
+                    new ItemStack(card, cards)));
         }
     }
 }

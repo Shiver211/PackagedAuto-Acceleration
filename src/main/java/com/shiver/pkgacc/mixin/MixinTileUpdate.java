@@ -1,5 +1,6 @@
 package com.shiver.pkgacc.mixin;
 
+import com.shiver.pkgacc.energy.EnergyCardHelper;
 import com.shiver.pkgacc.speed.SpeedCardHelper;
 import net.minecraft.util.ITickable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -47,6 +48,9 @@ public abstract class MixinTileUpdate {
         TileBase tile = (TileBase)(Object)this;
         if(tile.getWorld() == null || tile.getWorld().isRemote || tile.isInvalid()) {
             return;
+        }
+        if(EnergyCardHelper.isSupported(tile)) {
+            EnergyCardHelper.applyCapacity(tile);
         }
         int extraTicks = PackagedAcceleration$getExtraTicks(tile);
         if(extraTicks <= 0) {

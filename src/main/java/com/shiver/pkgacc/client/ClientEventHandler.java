@@ -1,6 +1,7 @@
 package com.shiver.pkgacc.client;
 
 import com.shiver.packaged_acceleration.Tags;
+import com.shiver.pkgacc.item.ItemEnergyCard;
 import com.shiver.pkgacc.item.ItemSpeedCard;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -15,5 +16,6 @@ public class ClientEventHandler {
     @SubscribeEvent
     public static void registerModels(ModelRegistryEvent event) {
         ItemSpeedCard.INSTANCE.registerModel();
+        ItemEnergyCard.INSTANCE.registerModel();
     }
 }

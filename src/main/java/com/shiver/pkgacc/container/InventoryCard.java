@@ -1,26 +1,41 @@
 package com.shiver.pkgacc.container;
 
-import com.shiver.pkgacc.item.ItemSpeedCard;
-import com.shiver.pkgacc.speed.SpeedCardHelper;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 
-import javax.annotation.Nonnull;
+import com.shiver.pkgacc.speed.SpeedCardHelper;
 
-public class InventorySpeedCard implements IInventory {
+import javax.annotation.Nonnull;
+import java.util.function.IntSupplier;
+import java.util.function.ObjIntConsumer;
+import java.util.function.ToIntFunction;
+
+public class InventoryCard implements IInventory {
 
     private final TileEntity tile;
+    private final Item card;
+    private final IntSupplier stackLimit;
+    private final ToIntFunction<TileEntity> getCards;
+    private final ObjIntConsumer<TileEntity> setCards;
+    private final String name;
     private final NonNullList<ItemStack> stack = NonNullList.withSize(1, ItemStack.EMPTY);
 
-    public InventorySpeedCard(TileEntity tile) {
+    public InventoryCard(TileEntity tile, Item card, IntSupplier stackLimit,
+                         ToIntFunction<TileEntity> getCards, ObjIntConsumer<TileEntity> setCards, String name) {
         this.tile = tile;
+        this.card = card;
+        this.stackLimit = stackLimit;
+        this.getCards = getCards;
+        this.setCards = setCards;
+        this.name = name;
         syncFromTile();
     }
 
@@ -74,7 +89,7 @@ public class InventorySpeedCard implements IInventory {
         if(stack.isEmpty()) {
             this.stack.set(0, ItemStack.EMPTY);
         }
-        else if(stack.getItem() == ItemSpeedCard.INSTANCE) {
+        else if(stack.getItem() == card) {
             ItemStack copy = stack.copy();
             copy.setCount(Math.min(copy.getCount(), getInventoryStackLimit()));
             this.stack.set(0, copy);
@@ -85,7 +100,7 @@ public class InventorySpeedCard implements IInventory {
 
     @Override
     public int getInventoryStackLimit() {
-        return com.shiver.pkgacc.config.PackagedAccelerationConfig.maxSpeedCards;
+        return stackLimit.getAsInt();
     }
 
     @Override
@@ -107,7 +122,7 @@ public class InventorySpeedCard implements IInventory {
 
     @Override
     public boolean isItemValidForSlot(int index, @Nonnull ItemStack stack) {
-        return index == 0 && SpeedCardHelper.isSupported(tile) && stack.getItem() == ItemSpeedCard.INSTANCE;
+        return index == 0 && SpeedCardHelper.isSupported(tile) && stack.getItem() == card;
     }
 
     @Override
@@ -126,13 +141,13 @@ public class InventorySpeedCard implements IInventory {
     @Override
     public void clear() {
         stack.set(0, ItemStack.EMPTY);
-        SpeedCardHelper.setCards(tile, 0);
+        setCards.accept(tile, 0);
     }
 
     @Override
     @MethodsReturnNonnullByDefault
     public String getName() {
-        return "container.packaged_acceleration.speed_card";
+        return name;
     }
 
     @Override
@@ -147,19 +162,19 @@ public class InventorySpeedCard implements IInventory {
     }
 
     private void syncFromTile() {
-        int cards = SpeedCardHelper.getCards(tile);
+        int cards = getCards.applyAsInt(tile);
         if(cards <= 0) {
             stack.set(0, ItemStack.EMPTY);
             return;
         }
         ItemStack current = stack.get(0);
-        if(current.isEmpty() || current.getItem() != ItemSpeedCard.INSTANCE || current.getCount() != cards) {
-            stack.set(0, new ItemStack(ItemSpeedCard.INSTANCE, cards));
+        if(current.isEmpty() || current.getItem() != card || current.getCount() != cards) {
+            stack.set(0, new ItemStack(card, cards));
         }
     }
 
     private void syncToTile() {
         ItemStack current = stack.get(0);
-        SpeedCardHelper.setCards(tile, current.isEmpty() ? 0 : current.getCount());
+        setCards.accept(tile, current.isEmpty() ? 0 : current.getCount());
     }
 }
