@@ -1,5 +1,6 @@
 {
 	"package": "com.shiver.pkgacc.mixin",
+	"plugin": "com.shiver.pkgacc.mixin.PackagedAccelerationMixinPlugin",
 	"required": true,
 	"refmap": "${mixin_refmap}",
 	"target": "@env(DEFAULT)",
