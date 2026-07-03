@@ -25,6 +25,13 @@ public class GuiCard extends GuiContainer {
     }
 
     @Override
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        drawDefaultBackground();
+        super.drawScreen(mouseX, mouseY, partialTicks);
+        renderHoveredToolTip(mouseX, mouseY);
+    }
+
+    @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         String title = I18n.format("container.packaged_acceleration.title");
         fontRenderer.drawString(title, 65, 6, 4210752);
