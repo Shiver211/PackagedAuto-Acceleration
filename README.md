@@ -5,7 +5,7 @@
 ## 功能
 
 - **封包速度卡** — 提高合成速度。
-- **封包储能卡** — 提升机器的内部储能容量。
+- **封包储能卡** — 提升机器的内部储能容量及能量输入、提取上限。
 
 ## 使用方法
 
@@ -37,7 +37,7 @@ A Minecraft 1.12.2 mod that adds acceleration upgrades for [PackagedAuto](https:
 ## Features
 
 - **Packaged Speed Card** — Increases crafting speed.
-- **Packaged Energy Card** — Increases internal energy storage capacity.
+- **Packaged Energy Card** — Increases internal energy storage capacity and energy receive/extract limits.
 
 ## Usage
 

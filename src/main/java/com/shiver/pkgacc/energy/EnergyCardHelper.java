@@ -34,6 +34,7 @@ public class EnergyCardHelper {
             }
             tile.markDirty();
             applyCapacity((TileBase)tile);
+            ((TileBase)tile).syncTile(false);
         }
     }
 
@@ -47,6 +48,9 @@ public class EnergyCardHelper {
 
     public static void writeSync(TileEntity tile, NBTTagCompound nbt) {
         nbt.setInteger(ENERGY_CARDS_KEY, getCards(tile));
+        if(tile.getTileData().hasKey(BASE_CAPACITY_KEY)) {
+            nbt.setInteger(BASE_CAPACITY_KEY, tile.getTileData().getInteger(BASE_CAPACITY_KEY));
+        }
     }
 
     public static void readSync(TileEntity tile, NBTTagCompound nbt) {
@@ -58,6 +62,14 @@ public class EnergyCardHelper {
             }
             else {
                 data.removeTag(ENERGY_CARDS_KEY);
+            }
+            if(nbt.hasKey(BASE_CAPACITY_KEY)) {
+                data.setInteger(BASE_CAPACITY_KEY, nbt.getInteger(BASE_CAPACITY_KEY));
+            }
+            // 必须先恢复容量，避免后续读档或能量同步按原始容量截断。
+            applyCapacity((TileBase)tile);
+            if(nbt.hasKey("Energy")) {
+                ((TileBase)tile).getEnergyStorage().readFromNBT(nbt);
             }
         }
     }
@@ -81,5 +93,7 @@ public class EnergyCardHelper {
         if(storage.getMaxEnergyStored() != target) {
             storage.setCapacity(target);
         }
+        // 封包机器的原始输入、提取上限均等于容量，升级和拆卡时一起恢复。
+        storage.setMaxTransfer(target);
     }
 }

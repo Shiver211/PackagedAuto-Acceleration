@@ -8,6 +8,8 @@ import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import thelm.packagedauto.energy.EnergyStorage;
 import thelm.packagedauto.tile.TileBase;
 
 import java.util.Map;
@@ -40,6 +42,14 @@ public abstract class MixinTileUpdate {
     private static final Map<TileBase, Double> PackagedAcceleration$extraTickProgress = new WeakHashMap<>();
     private static final ThreadLocal<Boolean> PackagedAcceleration$runningExtraTicks = ThreadLocal.withInitial(()->false);
 
+    @Inject(method = {"update", "func_73660_a"}, at = @At("HEAD"), remap = false)
+    private void PackagedAcceleration$applyCapacity(CallbackInfo ci) {
+        TileBase tile = (TileBase)(Object)this;
+        if(EnergyCardHelper.isSupported(tile)) {
+            EnergyCardHelper.applyCapacity(tile);
+        }
+    }
+
     @Inject(method = {"update", "func_73660_a"}, at = @At("RETURN"), remap = false)
     private void PackagedAcceleration$runExtraUpdates(CallbackInfo ci) {
         if(PackagedAcceleration$runningExtraTicks.get()) {
@@ -48,13 +58,6 @@ public abstract class MixinTileUpdate {
         TileBase tile = (TileBase)(Object)this;
         if(tile.getWorld() == null || tile.isInvalid()) {
             return;
-        }
-        // Reapply the expanded capacity on both sides every tick. The capacity is
-        // not persisted (only the stored energy is) nor synced (getUpdateTag strips
-        // ForgeData), so the client tile would otherwise keep the default capacity
-        // after a chunk load until the card GUI forced a resync.
-        if(EnergyCardHelper.isSupported(tile)) {
-            EnergyCardHelper.applyCapacity(tile);
         }
         if(tile.getWorld().isRemote) {
             return;
@@ -73,6 +76,14 @@ public abstract class MixinTileUpdate {
         finally {
             PackagedAcceleration$runningExtraTicks.set(false);
         }
+    }
+
+    @Inject(method = "getScaledEnergy", at = @At("HEAD"), cancellable = true, remap = false, require = 0)
+    private void PackagedAcceleration$scaleEnergy(int scale, CallbackInfoReturnable<Integer> cir) {
+        EnergyStorage storage = ((TileBase)(Object)this).getEnergyStorage();
+        int capacity = storage.getMaxEnergyStored();
+        // 扩容后，能量乘以能量条高度可能超出 int 范围。
+        cir.setReturnValue(capacity > 0 ? (int)((long)scale * storage.getEnergyStored() / capacity) : 0);
     }
 
     private int PackagedAcceleration$getExtraTicks(TileBase tile) {

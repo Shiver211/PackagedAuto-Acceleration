@@ -31,6 +31,7 @@ public class SpeedCardHelper {
                 data.removeTag(SPEED_CARDS_KEY);
             }
             tile.markDirty();
+            ((TileBase)tile).syncTile(false);
         }
     }
 
